@@ -43,6 +43,10 @@ namespace hal::detail
     };
 
     class pin_base;
+
+    using GPIO_TypeDef = ::GPIO_TypeDef;
+
+    constexpr static const uint8_t PINS_PER_PORT = 16;
 #elif defined(__AVR_ARCH__)
     struct GPIO_TypeDef
     {
@@ -74,8 +78,13 @@ namespace hal::detail
         #include <halpp/avr/gpio_typedef_template.h>
     #endif
 
-    #error AVR support is not implemented yet
+    enum class pin_mode
+    {
+        INPUT,
+        INPUT_PULLUP,
+        OUTPUT
+    };
 
-    // TODO
+    constexpr static const uint8_t PINS_PER_PORT = 8;
 #endif
 }

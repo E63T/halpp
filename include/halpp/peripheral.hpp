@@ -10,34 +10,35 @@ namespace hal
         virtual void disable() = 0;
         virtual bool enabled() = 0;
     };
+
+    class dummy_peripheral
+    {
+    public:
+        void enable(){}
+        void disable(){}
+        bool enabled(){ return true; }
+    };
     
     class peripheral : public peripheral_base
     {
     public:
-        peripheral(register_t* const reg, const uint32_t mask) : 
-            m_enabled(false),
-            m_register(reg),
-            m_mask(mask){}
+        peripheral(register_t* const reg, const uint32_t mask);
 
-        void enable()
-        {
-            *m_register |= m_mask;
-            m_enabled = true;
-        }
+        void enable();
 
-        void disable()
-        {
-            *m_register &= ~m_mask;
-            m_enabled = false;
-        }
+        void disable();
 
-        bool enabled()
-        {
-            return m_enabled;
-        }
+        bool enabled();
     private:
         bool m_enabled;
         register_t *const m_register;
         uint32_t const m_mask;
     };
+
+    #ifdef __AVR_ARCH__
+        #define HALPP_DUMMY_GPIO_PERIPHERAL
+        using gpio_peripheral = dummy_peripheral;
+    #else
+        using gpio_peripheral = peripheral;
+    #endif
 }

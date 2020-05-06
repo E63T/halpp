@@ -1,0 +1,10 @@
+
+#define HALPP_CAT(a, ...) HALPP_PRIMITIVE_CAT(a, __VA_ARGS__)
+#define HALPP_PRIMITIVE_CAT(a, ...) a ## __VA_ARGS__
+
+template<>
+GPIO_TypeDef port<HALPP_PORT_NAME>{
+    .DDR = &HALPP_CAT(DDR, HALPP_PORT_NAME),
+    .PORT = &HALPP_CAT(PORT, HALPP_PORT_NAME),
+    .PIN = &HALPP_CAT(PIN, HALPP_PORT_NAME)
+};

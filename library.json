@@ -1,0 +1,23 @@
+{
+    "name" : "halpp",
+    "version" : "0.0.1",
+    "description" : "Hardware Abstraction Layer to program MCUs with C++",
+    "platforms" : "ststm32",
+    "frameworks" : "cmsis",
+    "export" : {
+        "include" : [
+            "src/*.cpp",
+            "include/*.hpp",
+            "include/*.h"
+        ]
+    },
+    "build" : {
+        "unflags" : [
+            "-nostdlib",
+            "-nostartfiles"
+        ],
+        "flags" : [
+            "--specs=nosys.specs"
+        ]
+    }
+}

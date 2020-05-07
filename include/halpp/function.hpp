@@ -281,12 +281,7 @@ namespace hal
             else
             {
                 return op_call(this, args...);
-            }
-
-           
-
-            
-            
+            } 
         }
 
         R operator()(Args ... args)

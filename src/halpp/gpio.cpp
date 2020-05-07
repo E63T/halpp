@@ -146,7 +146,7 @@ bool hal::pin::interrupt(uint8_t trig,hal::function<void()>&& h, bool force)
     return hal::interrupt::register_exti(
         get_exti_line(),
         trig,
-        std::move(h),
+        std::forward<hal::function<void()> >(h),
         m_parent->get_name(),
         force
     );

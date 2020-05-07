@@ -4,6 +4,7 @@
 
 static volatile hal::function<void()> exti_handlers[hal::detail::EXTI_COUNT] = {nullptr};
 
+
 #ifdef __AVR_ARCH__
     #include <avr/io.h>
     #include <avr/interrupt.h>
@@ -22,7 +23,7 @@ static volatile hal::function<void()> exti_handlers[hal::detail::EXTI_COUNT] = {
 
 bool hal::interrupt::is_free_exti(uint8_t line)
 {
-    return line < hal::detail::EXTI_COUNT && (bool)exti_handlers[line];
+    return line < hal::detail::EXTI_COUNT && !((bool)exti_handlers[line]);
 }
 
 void hal::interrupt::trigger_exti(uint8_t line)
@@ -31,7 +32,7 @@ void hal::interrupt::trigger_exti(uint8_t line)
         exti_handlers[line]();
 }
 
-bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::function<void()>&& handler, char port_name, bool force, uint8_t prio)
+volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::function<void()>&& handler, char port_name, bool force, uint8_t prio)
 {
     if(line >= hal::detail::EXTI_COUNT)
         return false;
@@ -44,11 +45,11 @@ bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::function<voi
     #if defined(STM32F1)
         if(!trig) return false;
 
-        if(!hal::afio.enabled()) hal::afio.enable();
+        hal::afio.enable();
 
         uint8_t port_idx = port_name - 'A';
 
-        uint8_t reg_idx = line >> 4;
+        uint8_t reg_idx = line / 4;
         uint8_t bit_pos = (line & 3) * 4;
 
         AFIO->EXTICR[reg_idx] = (AFIO->EXTICR[reg_idx] & ~(0xF << bit_pos)) | (port_idx << bit_pos); 
@@ -146,42 +147,42 @@ void hal::interrupt::unregister_exti(uint8_t line)
 
 #if defined(STM32F1)
 
-    void EXTI0_IRQHandler()
+    extern "C" void EXTI0_IRQHandler()
     {
         NVIC_ClearPendingIRQ(EXTI0_IRQn);
         EXTI->PR |= 1 << 0;
         hal::interrupt::trigger_exti(0);
     }
 
-    void EXTI1_IRQHandler()
+    extern "C" void EXTI1_IRQHandler()
     {
         NVIC_ClearPendingIRQ(EXTI1_IRQn);
         EXTI->PR |= 1 << 1;
         hal::interrupt::trigger_exti(1);
     }
 
-    void EXTI2_IRQHandler()
+    extern "C" void EXTI2_IRQHandler()
     {
         NVIC_ClearPendingIRQ(EXTI2_IRQn);
         EXTI->PR |= 1 << 2;
         hal::interrupt::trigger_exti(2);
     }
 
-    void EXTI3_IRQHandler()
+    extern "C" void EXTI3_IRQHandler()
     {
         NVIC_ClearPendingIRQ(EXTI3_IRQn);
         EXTI->PR |= 1 << 3;
         hal::interrupt::trigger_exti(3);
     }
 
-    void EXTI4_IRQHandler()
+    extern "C" void EXTI4_IRQHandler()
     {
         NVIC_ClearPendingIRQ(EXTI4_IRQn);
         EXTI->PR |= 1 << 4;
         hal::interrupt::trigger_exti(4);
     }
 
-    void EXTI9_5_IRQHandler()
+    extern "C" void EXTI9_5_IRQHandler()
     {
         NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
         for(uint8_t idx = 5; idx <= 9; idx++)
@@ -194,7 +195,7 @@ void hal::interrupt::unregister_exti(uint8_t line)
         }
     }
 
-    void EXTI15_10_IRQHandler()
+    extern "C" void EXTI15_10_IRQHandler()
     {
         NVIC_ClearPendingIRQ(EXTI15_10_IRQn);
         for(uint8_t idx = 10; idx <= 15; idx++)

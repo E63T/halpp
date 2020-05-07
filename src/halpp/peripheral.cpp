@@ -22,3 +22,6 @@ bool hal::peripheral::enabled()
     return m_enabled;
 }
 
+#ifdef STM32F1
+    hal::peripheral hal::afio(&RCC->APB2ENR, RCC_APB2ENR_AFIOEN);
+#endif

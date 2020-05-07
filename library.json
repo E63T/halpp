@@ -17,7 +17,8 @@
             "-nostartfiles"
         ],
         "flags" : [
-            "--specs=nosys.specs"
+            "--specs=nosys.specs",
+            "-std=c++1z"
         ]
     }
 }

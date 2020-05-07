@@ -41,4 +41,8 @@ namespace hal
     #else
         using gpio_peripheral = peripheral;
     #endif
+
+    #ifdef STM32F1
+        extern peripheral afio;
+    #endif
 }

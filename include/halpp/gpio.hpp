@@ -1,6 +1,7 @@
 #pragma once
 #include <halpp/detail.hpp>
 #include <halpp/peripheral.hpp>
+#include <halpp/function.hpp>
 
 namespace hal
 {
@@ -12,6 +13,7 @@ namespace hal
         virtual uint8_t get_pin_count() = 0;
         virtual pin_base* get_pin(uint8_t index) = 0;
         virtual detail::GPIO_TypeDef* const get_gpio() = 0;
+        virtual char get_name() const = 0;
     };
 
     using pin_mode = detail::pin_mode;
@@ -27,6 +29,8 @@ namespace hal
         virtual void toggle() = 0;
 
         virtual gpio_base* parent() = 0;
+        virtual bool can_register_exti() = 0;
+        virtual bool interrupt(uint8_t, hal::function<void()>&&, bool = false) = 0;
 
         void write(bool value);
     };
@@ -56,6 +60,12 @@ namespace hal
         bool read_output();
 
         void toggle();
+
+        bool can_register_exti();
+        
+        bool interrupt(uint8_t trig, hal::function<void()>&& handler, bool force = false);
+
+        uint8_t get_exti_line();
 
     private:
         gpio_base* m_parent;
@@ -99,6 +109,10 @@ namespace hal
             return m_gpio;
         }
 
+        virtual char get_name() const
+        {
+            return PortName;
+        }
     private:
         detail::GPIO_TypeDef* const m_gpio;
         pin m_pins[detail::PINS_PER_PORT];  

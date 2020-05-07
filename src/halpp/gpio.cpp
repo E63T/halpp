@@ -1,4 +1,5 @@
 #include <halpp/gpio.hpp>
+#include <halpp/interrupt.hpp>
 
 void hal::pin_base::write(bool v)
 {
@@ -117,5 +118,37 @@ void hal::pin::toggle()
     #else
         #error Unsupported MCU
     #endif
+}
+
+
+uint8_t hal::pin::get_exti_line()
+{
+    #ifdef STM32F1
+        return m_number;
+    #elif defined(__AVR_ARCH__)
+        if(!m_parent) return 255;
+
+        return (m_parent->get_name() - 'B') * 8 + m_number;
+    #endif
+}
+
+bool hal::pin::can_register_exti()
+{
+    if(!m_parent) return false;
+
+    return hal::interrupt::is_free_exti(get_exti_line());
+}
+
+bool hal::pin::interrupt(uint8_t trig,hal::function<void()>&& h, bool force)
+{
+    if(!m_parent) return false;
+
+    return hal::interrupt::register_exti(
+        get_exti_line(),
+        trig,
+        std::move(h),
+        m_parent->get_name(),
+        force
+    );
 }
 

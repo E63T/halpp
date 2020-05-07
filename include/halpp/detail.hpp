@@ -1,6 +1,12 @@
 #pragma once
 #include <halpp/system.hpp>
 #include <stdint.h>
+
+#ifdef __AVR_ARCH__
+    #include <avr/interrupt.h>
+    #include <avr/io.h>
+#endif
+
 namespace hal::detail
 {
 #if defined(STM32F1)
@@ -47,7 +53,28 @@ namespace hal::detail
     using GPIO_TypeDef = ::GPIO_TypeDef;
 
     constexpr static const uint8_t PINS_PER_PORT = 16;
+
+    extern "C"
+    {
+        void EXTI0_IRQHandler();
+
+        void EXTI1_IRQHandler();
+
+        void EXTI2_IRQHandler();
+
+        void EXTI3_IRQHandler();
+
+        void EXTI4_IRQHandler();
+
+        void EXTI9_5_IRQHandler();
+
+        void EXTI15_10_IRQHandler();
+    }
+
+    constexpr static const uint8_t EXTI_COUNT = 16;
 #elif defined(__AVR_ARCH__)
+    // TODO : define for other AVR MCUs
+
     struct GPIO_TypeDef
     {
         register_t* PORT;
@@ -86,5 +113,7 @@ namespace hal::detail
     };
 
     constexpr static const uint8_t PINS_PER_PORT = 8;
+
+    constexpr static const uint8_t EXTI_COUNT = 23; // INT0, INT1 + EXTI
 #endif
 }

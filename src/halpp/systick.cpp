@@ -1,5 +1,6 @@
 #include <halpp/system.hpp>
 #include <halpp/systick.hpp>
+#include <halpp/clock.hpp>
 
 namespace hal::systick
 {
@@ -7,7 +8,7 @@ namespace hal::systick
 
     void init()
     {
-        SysTick->LOAD = FREQUENCY / 1000 - 1;
+        SysTick->LOAD = clock::ahb_prescaler.frequency() / 1000 - 1;
         SysTick->VAL = 0;
         SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk;
     }

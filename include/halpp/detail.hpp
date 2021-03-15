@@ -59,6 +59,14 @@ namespace hal
 
         using GPIO_TypeDef = ::GPIO_TypeDef;
 
+        extern "C"
+        {
+            void EXTI0_1_IRQHandler();
+
+            void EXTI2_3_IRQHandler();
+
+            void EXTI4_15_IRQHandler();
+        }
 
         constexpr static const uint8_t EXTI_COUNT = 16; // TODO
     

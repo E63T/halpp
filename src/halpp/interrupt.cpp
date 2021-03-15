@@ -42,17 +42,25 @@ volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::fun
 
     exti_handlers[line] = std::move(handler);
 
-    #if defined(STM32F1)
+    #if defined(STM32F1) || defined(STM32F0)
         if(!trig) return false;
 
-        hal::afio.enable();
+        #if defined(STM32F1)
+            hal::afio.enable();
+
+        #endif
 
         uint8_t port_idx = port_name - 'A';
 
         uint8_t reg_idx = line / 4;
         uint8_t bit_pos = (line & 3) * 4;
 
-        AFIO->EXTICR[reg_idx] = (AFIO->EXTICR[reg_idx] & ~(0xF << bit_pos)) | (port_idx << bit_pos); 
+        #if defined(STM32F0)
+            SYSCFG->EXTICR[reg_idx] = (SYSCFG->EXTICR[reg_idx] & ~(0xF << bit_pos)) | (port_idx << bit_pos); 
+        #elif defined(STM32F1)
+
+            AFIO->EXTICR[reg_idx] = (AFIO->EXTICR[reg_idx] & ~(0xF << bit_pos)) | (port_idx << bit_pos); 
+        #endif
 
         if(trig & hal::FALLING)
             EXTI->FTSR |= 1 << line;
@@ -67,22 +75,42 @@ volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::fun
         EXTI->PR |= 1 << line;
         EXTI->IMR |= 1 << line;
 
-        decltype(EXTI0_IRQn) irq;
 
-        if(line == 0)
-            irq = EXTI0_IRQn;
-        else if(line == 1)
-            irq = EXTI1_IRQn;
-        else if(line == 2)
-            irq = EXTI2_IRQn;
-        else if(line == 3)
-            irq = EXTI3_IRQn;
-        else if(line == 4)
-            irq = EXTI4_IRQn;
-        else if(line <= 9)
-            irq = EXTI9_5_IRQn;
-        else if(line <= 15)
-            irq = EXTI15_10_IRQn;
+        
+
+        #if defined(STM32F1)
+            decltype(EXTI0_IRQn) irq;
+
+            if(line == 0)
+                irq = EXTI0_IRQn;
+            else if(line == 1)
+                irq = EXTI1_IRQn;
+            else if(line == 2)
+                irq = EXTI2_IRQn;
+            else if(line == 3)
+                irq = EXTI3_IRQn;
+            else if(line == 4)
+                irq = EXTI4_IRQn;
+            else if(line <= 9)
+                irq = EXTI9_5_IRQn;
+            else if(line <= 15)
+                irq = EXTI15_10_IRQn;
+        #elif defined(STM32F0)
+            decltype(EXTI0_1_IRQn) irq;
+            switch(line)
+            {
+                case 0:
+                case 1:
+                    irq = EXTI0_1_IRQn;
+                    break;
+                case 2:
+                case 3:
+                    irq = EXTI2_3_IRQn;
+                    break;
+                default:
+                    irq = EXTI4_15_IRQn;
+            }
+        #endif
 
         NVIC_EnableIRQ(irq);
     #elif defined(__AVR_ARCH__)
@@ -145,7 +173,51 @@ void hal::interrupt::unregister_exti(uint8_t line)
     #endif
 }
 
-#if defined(STM32F1)
+#if defined(STM32F0)
+
+extern "C"
+{
+    void EXTI0_1_IRQHandler()
+    {
+        NVIC_ClearPendingIRQ(EXTI0_1_IRQn);
+        for(uint8_t idx = 0; idx <= 1; idx++)
+        {
+            if(EXTI->PR & (1 << idx))
+            {
+                EXTI->PR |= (1 << idx);
+                hal::interrupt::trigger_exti(idx);
+            }
+        }
+    }
+
+    void EXTI2_3_IRQHandler()
+    {
+        NVIC_ClearPendingIRQ(EXTI2_3_IRQn);
+        for(uint8_t idx = 2; idx <= 3; idx++)
+        {
+            if(EXTI->PR & (1 << idx))
+            {
+                EXTI->PR |= (1 << idx);
+                hal::interrupt::trigger_exti(idx);
+            }
+        }
+    }
+
+    void EXTI4_15_IRQHandler()
+    {
+        NVIC_ClearPendingIRQ(EXTI4_15_IRQn);
+        for(uint8_t idx = 4; idx <= 15; idx++)
+        {
+            if(EXTI->PR & (1 << idx))
+            {
+                EXTI->PR |= (1 << idx);
+                hal::interrupt::trigger_exti(idx);
+            }
+        }
+    }
+}
+
+#elif defined(STM32F1)
 
     extern "C" void EXTI0_IRQHandler()
     {

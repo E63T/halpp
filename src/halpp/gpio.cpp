@@ -142,10 +142,8 @@ void hal::pin::toggle()
 
 uint8_t hal::pin::get_exti_line()
 {
-    #ifdef STM32F1
+    #if defined(STM32F0) || defined(STM32F1)
         return m_number;
-    #elif defined(STM32F0)
-        return 0; // TODO: interrupts
     #elif defined(__AVR_ARCH__)
         if(!m_parent) return 255;
 

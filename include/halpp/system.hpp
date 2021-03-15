@@ -1,10 +1,13 @@
 #pragma once
 
+
 #ifdef STM32F1
     #include <stm32f1xx.h>
-#elif defined(STM32F030x6)
+#elif defined(STM32F030x6) || defined(STM32F030x4)
     #include <stm32f030x6.h>
-#elif defined(STM32F0) || defined(STM32F030)
+#elif defined(STM32F042x6)
+    #include <stm32f042x6.h>
+#elif defined(STM32F0) || defined(STM32F030) ||defined(STM32F042)
     #error Please specify more concrete MCU (e.g. STM32F030x6)
 #elif defined(__AVR_ARCH__)
     #include <avr/io.h>

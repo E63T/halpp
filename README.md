@@ -12,9 +12,9 @@ The only currently supported MCU is STM32F103, but support for STM32F405, STM32F
 Feature status
 ==
 
-| Target    | F030 | F103      | F401 | F405 | F407 | F429 | ATmega328p |
-|-----------|------|-----------|------|------|------|------|------------|
-|Compiles   | :white_check_mark:  |:question: |  :x: | :x:  | :x:  | :x:  | :question: |
-|Blinks LED | :white_check_mark:  |:question: | :x:  | :x:  | :x:  | :x:  | :question: |
-|Delay works| :question:  |:question: | :x:  | :x:  | :x:  | :x:  | :x:        |
-|Interrupts | :x: | :question: | :x: | :x: | :x: | :x:| :x: |
+| Target    | F030             | F042     | F103     | F401 | F405 | F407 | F429 | ATmega328p |
+|-----------|------------------|----------|----------|------|------|------|------|------------|
+|Compiles   |:white_check_mark:|:question:|:question:|  :x: | :x:  | :x:  | :x:  | :question: |
+|Blinks LED |:white_check_mark:|:question:|:question:| :x:  | :x:  | :x:  | :x:  | :question: |
+|Delay works|:question:        |:question:|:question:| :x:  | :x:  | :x:  | :x:  | :x:        |
+|Interrupts |:white_check_mark:|:question:|:question:| :x:  | :x:  | :x:  | :x:  | :x:        |

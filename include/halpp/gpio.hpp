@@ -96,7 +96,7 @@ namespace hal
 
         gpio() : 
             #if !defined(HALPP_DUMMY_GPIO_PERIPHERAL)
-                peripheral(&RCC->APB2ENR, detail::GPIO_RCC_EMASK<PortName>),
+                peripheral(detail::GPIO_ENR, detail::GPIO_RCC_EMASK<PortName>),
             #endif
             m_gpio(reinterpret_cast<detail::GPIO_TypeDef*>(detail::GPIO_ADDR<PortName>))
         {

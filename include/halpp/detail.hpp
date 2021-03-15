@@ -11,13 +11,59 @@ namespace hal
 { 
     namespace detail
     {
-    #if defined(STM32F1)
-        template<typename T1, typename T2>
-        inline constexpr uint32_t offset_of(T1 T2::*member)
+    template<typename T1, typename T2>
+    inline constexpr uint32_t offset_of(T1 T2::*member)
+    {
+        constexpr T2 object{};
+        return size_t(&(object.*member)) - size_t(&object);
+    }
+
+    template<typename ...>
+    using void_t = void;
+
+    #if defined(STM32F0) || defined(STM32F1)
+        constexpr static const uint8_t PINS_PER_PORT = 16;
+    #endif
+    
+    #if defined(STM32F0)
+    
+        static register_t* GPIO_ENR = &RCC->AHBENR;
+        constexpr static uint32_t GPIO_RCC_EBB = RCC_AHBENR_GPIOAEN;
+
+         template<char PortName>
+        constexpr uint32_t GPIO_RCC_EMASK = GPIO_RCC_EBB << (PortName - 'A');
+
+        template<char PortName>
+        constexpr uint32_t GPIO_ADDR = GPIOA_BASE + 0x400 * (PortName - 'A');
+
+        enum class pin_mode
         {
-            constexpr T2 object{};
-            return size_t(&(object.*member)) - size_t(&object);
-        }
+            //Name          =   MMTSSPP
+            INPUT           = 0b0000000,
+            INPUT_PULLUP    = 0b0000001,
+            INPUT_PULLDOWN  = 0b0000010,
+            OUTPUT_10M      = 0b0100000,
+            OUTPUT          = 0b0100100,
+            OUTPUT_50M      = 0b0101100,
+            OUTPUT_OD_10M   = 0b0110000,
+            OUTPUT_OD       = 0b0110100,
+            OUTPUT_OD_50M   = 0b0111100,
+            AFO_10M         = 0b1000000,
+            AFO             = 0b1000100,
+            AFO_50M         = 0b1001100,
+            AFO_OD_10M      = 0b1010000,
+            AFO_OD          = 0b1010100,
+            AFO_OD_50M      = 0b1011100,
+            ANALOG          = 0b1100000
+        };
+
+        using GPIO_TypeDef = ::GPIO_TypeDef;
+
+
+        constexpr static const uint8_t EXTI_COUNT = 16; // TODO
+    
+    #elif defined(STM32F1)
+        static register_t* GPIO_ENR = &RCC->APB2ENR;
 
         constexpr static uint32_t GPIO_RCC_EBB = RCC_APB2ENR_IOPAEN;
 
@@ -27,34 +73,33 @@ namespace hal
         template<char PortName>
         constexpr uint32_t GPIO_ADDR = GPIOA_BASE + 0x400 * (PortName - 'A');
 
-        template<typename ...>
-        using void_t = void;
+        
 
         enum class pin_mode
         {
             INPUT_ANALOG = 0x0,
-            OUT_10M= 0x1,
-            OUT = 0x2,
-            OUT_50M = 0x3,
+            OUTPUT_10M= 0x1,
+            OUTPUT = 0x2,
+            OUTPUT_50M = 0x3,
             INPUT = 0x4,
-            OUT_OPEN_DRAIN_10M= 0x5,
-            OUT_OPEN_DRAIN = 0x6,
-            OUT_OPEN_DRAIN_50M = 0x7,
+            OUTPUT_OD_10M= 0x5,
+            OUTPUT_OD = 0x6,
+            OUTPUT_OD_50M = 0x7,
             INPUT_PULLDOWN = 0x8,
             AFO_10M = 0x9,
             AFO = 0xA,
             AFO_50M = 0xB,
             INPUT_PULLUP = 0xC,
-            AFO_OPEN_DRAIN_10M = 0xD,
-            AFO_OPEN_DRAIN = 0xE,
-            AFO_OPEN_DRAIN_50M = 0xF
+            AFO_OD_10M = 0xD,
+            AFO_OD = 0xE,
+            AFO_OD_50M = 0xF
         };
 
         class pin_base;
 
         using GPIO_TypeDef = ::GPIO_TypeDef;
 
-        constexpr static const uint8_t PINS_PER_PORT = 16;
+        
 
         extern "C"
         {

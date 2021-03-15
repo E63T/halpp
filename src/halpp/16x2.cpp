@@ -50,13 +50,13 @@ void hal::lcd16x2::data(uint8_t data)
 
 void hal::lcd16x2::init()
 {
-    this->m_rw.mode(hal::pin_mode::OUT_10M);
-    this->m_rs.mode(hal::pin_mode::OUT_10M);
-    this->m_e.mode(hal::pin_mode::OUT_10M);
-    this->m_d4.mode(hal::pin_mode::OUT_10M);
-    this->m_d5.mode(hal::pin_mode::OUT_10M);
-    this->m_d6.mode(hal::pin_mode::OUT_10M);
-    this->m_d7.mode(hal::pin_mode::OUT_10M);
+    this->m_rw.mode(hal::pin_mode::OUTPUT_10M);
+    this->m_rs.mode(hal::pin_mode::OUTPUT_10M);
+    this->m_e.mode(hal::pin_mode::OUTPUT_10M);
+    this->m_d4.mode(hal::pin_mode::OUTPUT_10M);
+    this->m_d5.mode(hal::pin_mode::OUTPUT_10M);
+    this->m_d6.mode(hal::pin_mode::OUTPUT_10M);
+    this->m_d7.mode(hal::pin_mode::OUTPUT_10M);
     this->m_rw.reset();
     hal::systick::delay(50);
     this->m_e.reset();
@@ -107,7 +107,7 @@ void hal::lcd16x2::wait_busy()
     } 
     while(m_d7.read());
     this->m_rw.reset();
-    this->m_d7.mode(hal::pin_mode::OUT_10M);
+    this->m_d7.mode(hal::pin_mode::OUTPUT_10M);
 }
 
 void hal::lcd16x2::puts(char* d)

@@ -34,6 +34,25 @@ void hal::pin::mode(pin_mode m)
             reg = &m_parent->get_gpio()->CRH;
 
         *reg = (*reg & ~(0xF << position*4)) | (((uint8_t)m & 0xF) << position*4);
+    #elif defined(STM32F0)
+        auto mode = (unsigned) m;
+        
+        auto pupd = mode & 3;
+        register_t* reg = &m_parent->get_gpio()->PUPDR;
+        *reg = (*reg & ~(0x3 << m_number * 2)) | (pupd << m_number * 2);
+        
+        auto speed = (mode >> 2) & 3;
+        reg = &m_parent->get_gpio()->OSPEEDR;
+        *reg = (*reg & ~(0x3 << m_number * 2)) | (speed << m_number * 2);
+        
+        auto type = (mode >> 4) & 1;
+        reg = &m_parent->get_gpio()->OTYPER;
+        *reg = (*reg & ~(1 << m_number)) | (type << m_number);
+
+        auto mode_v = (mode >> 5) & 3;
+        reg = &m_parent->get_gpio()->MODER;
+        *reg = (*reg & ~(0x3 << m_number)) | (mode_v << m_number * 2);
+
     #elif defined(__AVR_ARCH__)
         register_t* ddr = m_parent->get_gpio()->DDR;
         register_t* port = m_parent->get_gpio()->PORT;
@@ -59,7 +78,7 @@ void hal::pin::mode(pin_mode m)
 void hal::pin::set()
 {
     if(!m_parent) return;
-    #if defined(STM32F1)
+    #if defined(STM32F1) || defined(STM32F0)
         m_parent->get_gpio()->BSRR = 1 << m_number;
     #elif defined(__AVR_ARCH__)
         *(m_parent->get_gpio()->PORT) |= _BV(m_number);
@@ -72,7 +91,7 @@ void hal::pin::reset()
 {
     if(!m_parent) return;
 
-    #if defined(STM32F1)
+    #if defined(STM32F1) || defined(STM32F0)
         m_parent->get_gpio()->BRR = 1 << m_number;
     #elif defined(__AVR_ARCH__)
         *(m_parent->get_gpio()->PORT) &= ~_BV(m_number);
@@ -85,7 +104,7 @@ bool hal::pin::read()
 {
     if(!m_parent) return 0;
     
-    #if defined(STM32F1)
+    #if defined(STM32F1) || defined(STM32F0)
         return m_parent->get_gpio()->IDR & (1 << m_number);
     #elif defined(__AVR_ARCH__)
         return *(m_parent->get_gpio()->PIN) & _BV(m_number);
@@ -98,7 +117,7 @@ bool hal::pin::read_output()
 {
     if(!m_parent) return 0;
     
-    #if defined(STM32F1)
+    #if defined(STM32F1) || defined(STM32F0)
         return m_parent->get_gpio()->ODR & (1 << m_number);
     #elif defined(__AVR_ARCH__)
         return *(m_parent->get_gpio()->PORT) & _BV(m_number);
@@ -111,7 +130,7 @@ void hal::pin::toggle()
 {
     if(!m_parent) return;
     
-    #if defined(STM32F1)
+    #if defined(STM32F1) || defined(STM32F0)
         m_parent->get_gpio()->ODR ^= (1 << m_number);
     #elif defined(__AVR_ARCH__)
         *(m_parent->get_gpio()->PORT) &= _BV(m_number);
@@ -125,6 +144,8 @@ uint8_t hal::pin::get_exti_line()
 {
     #ifdef STM32F1
         return m_number;
+    #elif defined(STM32F0)
+        return 0; // TODO: interrupts
     #elif defined(__AVR_ARCH__)
         if(!m_parent) return 255;
 

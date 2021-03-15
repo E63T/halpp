@@ -8,7 +8,12 @@ namespace hal::systick
 
     void init()
     {
-        SysTick->LOAD = clock::ahb_prescaler.frequency() / 1000 - 1;
+        #ifdef STM32F0
+            auto freq = clock::sysclock_mux.frequency();
+        #elif defined(STM32F1)
+            auto fre = clock::ahb_prescaler.frequency();
+        #endif
+        SysTick->LOAD = freq / 1000 - 1;
         SysTick->VAL = 0;
         SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk;
     }

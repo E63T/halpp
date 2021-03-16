@@ -8,7 +8,7 @@ namespace hal::systick
 
     void init()
     {
-        #ifdef STM32F0
+        #if defined(STM32F0) || defined(STM32F4)
             auto freq = clock::sysclock_mux.frequency();
         #elif defined(STM32F1)
             auto fre = clock::ahb_prescaler.frequency();

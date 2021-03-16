@@ -42,7 +42,7 @@ volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::fun
 
     exti_handlers[line] = std::move(handler);
 
-    #if defined(STM32F1) || defined(STM32F0)
+    #if defined(STM32F1) || defined(STM32F0) || defined(STM32F4)
         if(!trig) return false;
 
         #if defined(STM32F1)
@@ -55,7 +55,7 @@ volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::fun
         uint8_t reg_idx = line / 4;
         uint8_t bit_pos = (line & 3) * 4;
 
-        #if defined(STM32F0)
+        #if defined(STM32F0) || defined(STM32F4)
             SYSCFG->EXTICR[reg_idx] = (SYSCFG->EXTICR[reg_idx] & ~(0xF << bit_pos)) | (port_idx << bit_pos); 
         #elif defined(STM32F1)
 
@@ -78,7 +78,7 @@ volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::fun
 
         
 
-        #if defined(STM32F1)
+        #if defined(STM32F1) || defined(STM32F4)
             decltype(EXTI0_IRQn) irq;
 
             if(line == 0)
@@ -217,7 +217,7 @@ extern "C"
     }
 }
 
-#elif defined(STM32F1)
+#elif defined(STM32F1) || defined(STM32F4)
 
     extern "C" void EXTI0_IRQHandler()
     {

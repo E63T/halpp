@@ -34,7 +34,7 @@ void hal::pin::mode(pin_mode m)
             reg = &m_parent->get_gpio()->CRH;
 
         *reg = (*reg & ~(0xF << position*4)) | (((uint8_t)m & 0xF) << position*4);
-    #elif defined(STM32F0)
+    #elif defined(STM32F0) || defined(STM32F4)
         auto mode = (unsigned) m;
         
         auto pupd = mode & 3;
@@ -78,7 +78,7 @@ void hal::pin::mode(pin_mode m)
 void hal::pin::set()
 {
     if(!m_parent) return;
-    #if defined(STM32F1) || defined(STM32F0)
+    #if defined(STM32F1) || defined(STM32F0) || defined(STM32F4)
         m_parent->get_gpio()->BSRR = 1 << m_number;
     #elif defined(__AVR_ARCH__)
         *(m_parent->get_gpio()->PORT) |= _BV(m_number);
@@ -93,6 +93,8 @@ void hal::pin::reset()
 
     #if defined(STM32F1) || defined(STM32F0)
         m_parent->get_gpio()->BRR = 1 << m_number;
+    #elif defined(STM32F4)
+        m_parent->get_gpio()->BSRR = 1 << (m_number + 16);
     #elif defined(__AVR_ARCH__)
         *(m_parent->get_gpio()->PORT) &= ~_BV(m_number);
     #else
@@ -104,7 +106,7 @@ bool hal::pin::read()
 {
     if(!m_parent) return 0;
     
-    #if defined(STM32F1) || defined(STM32F0)
+    #if defined(STM32F1) || defined(STM32F0) || defined(STM32F4)
         return m_parent->get_gpio()->IDR & (1 << m_number);
     #elif defined(__AVR_ARCH__)
         return *(m_parent->get_gpio()->PIN) & _BV(m_number);
@@ -117,7 +119,7 @@ bool hal::pin::read_output()
 {
     if(!m_parent) return 0;
     
-    #if defined(STM32F1) || defined(STM32F0)
+    #if defined(STM32F1) || defined(STM32F0) || defined(STM32F4)
         return m_parent->get_gpio()->ODR & (1 << m_number);
     #elif defined(__AVR_ARCH__)
         return *(m_parent->get_gpio()->PORT) & _BV(m_number);
@@ -130,7 +132,7 @@ void hal::pin::toggle()
 {
     if(!m_parent) return;
     
-    #if defined(STM32F1) || defined(STM32F0)
+    #if defined(STM32F1) || defined(STM32F0) || defined(STM32F4)
         m_parent->get_gpio()->ODR ^= (1 << m_number);
     #elif defined(__AVR_ARCH__)
         *(m_parent->get_gpio()->PORT) &= _BV(m_number);
@@ -142,7 +144,7 @@ void hal::pin::toggle()
 
 uint8_t hal::pin::get_exti_line()
 {
-    #if defined(STM32F0) || defined(STM32F1)
+    #if defined(STM32F0) || defined(STM32F1) || defined(STM32F4)
         return m_number;
     #elif defined(__AVR_ARCH__)
         if(!m_parent) return 255;

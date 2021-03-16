@@ -193,4 +193,6 @@ namespace hal
     #include <halpp/stm32/f1/rcc.hpp>
 #elif defined(STM32F0)
     #include <halpp/stm32/f0/rcc.hpp>
+#elif defined(STM32F4)
+    #include <halpp/stm32/f4/rcc.hpp>
 #endif

@@ -21,15 +21,19 @@ namespace hal
     template<typename ...>
     using void_t = void;
 
-    #if defined(STM32F0) || defined(STM32F1)
+    #if defined(STM32F0) || defined(STM32F1) || defined(STM32F4)
         constexpr static const uint8_t PINS_PER_PORT = 16;
     #endif
     
-    #if defined(STM32F0)
+    #if defined(STM32F0) || defined(STM32F4)
     
-        static register_t* GPIO_ENR = &RCC->AHBENR;
-        constexpr static uint32_t GPIO_RCC_EBB = RCC_AHBENR_GPIOAEN;
-
+        #if defined(STM32F0)
+            static register_t* const GPIO_ENR = &RCC->AHBENR;
+            constexpr static uint32_t GPIO_RCC_EBB = RCC_AHBENR_GPIOAEN;
+        #elif defined(STM32F4)
+            static register_t* const GPIO_ENR = &RCC->AHB1ENR;
+            constexpr static uint32_t GPIO_RCC_EBB = RCC_AHB1ENR_GPIOAEN;
+        #endif
          template<char PortName>
         constexpr uint32_t GPIO_RCC_EMASK = GPIO_RCC_EBB << (PortName - 'A');
 
@@ -59,15 +63,33 @@ namespace hal
 
         using GPIO_TypeDef = ::GPIO_TypeDef;
 
-        extern "C"
-        {
-            void EXTI0_1_IRQHandler();
+        #if defined(STM32F0)
+            extern "C"
+            {
+                void EXTI0_1_IRQHandler();
 
-            void EXTI2_3_IRQHandler();
+                void EXTI2_3_IRQHandler();
 
-            void EXTI4_15_IRQHandler();
-        }
+                void EXTI4_15_IRQHandler();
+            }
+        #elif defined(STM32F4)
+            extern "C"
+            {
+                void EXTI0_IRQHandler();
 
+                void EXTI1_IRQHandler();
+
+                void EXTI2_IRQHandler();
+
+                void EXTI3_IRQHandler();
+
+                void EXTI4_IRQHandler();
+
+                void EXTI9_5_IRQHandler();
+
+                void EXTI15_10_IRQHandler();
+            }
+        #endif
         constexpr static const uint8_t EXTI_COUNT = 16; // TODO
     
     #elif defined(STM32F1)

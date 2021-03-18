@@ -8,12 +8,16 @@ Just another C++ hardware abstraction Layer :sweat_smile:
 Feature status
 --
 
-| Target    | F030             | F042     | F103     | F401             | F405 | F407             | F429 | ATmega328p |
-|-----------|------------------|----------|----------|------------------|------|------------------|------|------------|
-|Compiles   |:white_check_mark:|:question:|:question:|:white_check_mark:| :x:  |:white_check_mark:| :x:  | :question: |
-|Blinks LED |:white_check_mark:|:question:|:question:|:question:        | :x:  |:white_check_mark:| :x:  | :question: |
-|Delay works|:question:        |:question:|:question:|:question:        | :x:  |:white_check_mark:| :x:  | :x:        |
-|Interrupts |:white_check_mark:|:question:|:question:|:question:        | :x:  |:white_check_mark:| :x:  | :question: |
+* :x: - Broken or not implemented
+* :question: - Not tested
+* :white_check_mark: - Works
+
+| Target    | F030             | F042     | F103     | F401             | F405 | F407             |   F429   | ATmega328p |
+|-----------|------------------|----------|----------|------------------|------|------------------|----------|------------|
+|Compiles   |:white_check_mark:|:question:|:question:|:white_check_mark:| :x:  |:white_check_mark:|:question:| :question: |
+|Blinks LED |:white_check_mark:|:question:|:question:|:question:        | :x:  |:white_check_mark:|:question:| :question: |
+|Delay works|:question:        |:question:|:question:|:question:        | :x:  |:white_check_mark:|:question:| :x:        |
+|Interrupts |:white_check_mark:|:question:|:question:|:question:        | :x:  |:white_check_mark:|:question:| :question: |
 
 Example
 --

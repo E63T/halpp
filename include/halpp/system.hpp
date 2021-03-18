@@ -12,6 +12,8 @@
     #include <stm32f401xe.h>
 #elif defined(STM32F407)
     #include <stm32f407xx.h>
+#elif defined(STM32F429)
+    #include <stm32f429xx.h>
 #elif defined(STM32F0) || defined(STM32F030) ||defined(STM32F042) || defined(STM32F4)
     #error Please specify more concrete MCU (e.g. STM32F030x6)
 #elif defined(__AVR_ARCH__)
@@ -19,6 +21,7 @@
 #else
     #error This MCU is not supported
 #endif
+
 
 #include <cstddef>
 

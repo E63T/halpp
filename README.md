@@ -30,8 +30,8 @@ Example
 
 int main()
 {
+   hal::init();
    hal::afio.enable();
-   hal::systick::init();
    #if defined(STM32F407)
       hal::port<'D'>.enable();
       hal::port<'E'>.enable();

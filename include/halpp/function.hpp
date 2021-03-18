@@ -83,18 +83,18 @@ namespace hal
         {
             void (*call)();
             void (*dtor)(store&);
-            void (*copy)(store&, store&);
+            void (*copy)(store&, const store&);
         };
 
 
         template<typename F, typename std::enable_if_t< std::is_trivially_copyable<F>::value, int> = 0 >
-        constexpr static void target_copy(store& dest, store& src)
+        constexpr static void target_copy(store& dest, const store& src)
         {
             std::memcpy(&dest, &src, sizeof(store));
         }
 
         template<typename F, typename  std::enable_if_t< !std::is_trivially_copyable<F>::value, int > = 0 >
-        constexpr static void target_copy(store& dest, store& src)
+        constexpr static void target_copy(store& dest, const store& src)
         {
             const F& f = reinterpret_cast<const F&>(src);
             new (&dest) F(f);
@@ -135,6 +135,7 @@ namespace hal
 
         void destroy()
         {
+            const volatile ops* opers = m_ops;
             if(m_ops && m_ops->dtor)
                 m_ops->dtor(m_storage);
         }
@@ -363,4 +364,10 @@ namespace hal
 
 
     };
+
+    template<typename F> 
+    struct is_function : std::false_type{};
+    
+    template<typename R, typename ... Args>
+    struct is_function< function<R(Args...)> > : std::true_type{};
 }

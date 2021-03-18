@@ -160,14 +160,14 @@ bool hal::pin::can_register_exti()
     return hal::interrupt::is_free_exti(get_exti_line());
 }
 
-bool hal::pin::interrupt(uint8_t trig,hal::function<void()>&& h, bool force)
+bool hal::pin::interrupt(uint8_t trig, const hal::function<void()>& h, bool force)
 {
     if(!m_parent) return false;
 
     return hal::interrupt::register_exti(
         get_exti_line(),
         trig,
-        std::forward<hal::function<void()> >(h),
+        h,
         m_parent->get_name(),
         force
     );

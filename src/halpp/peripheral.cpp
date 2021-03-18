@@ -24,4 +24,8 @@ bool hal::peripheral::enabled()
 
 #if defined(STM32F1)
     hal::peripheral hal::afio(&RCC->APB2ENR, RCC_APB2ENR_AFIOEN);
+#elif defined(STM32F0) 
+    hal::peripheral hal::afio(&RCC->APB2ENR, RCC_APB2ENR_SYSCFGCOMPEN);
+#elif defined(STM32F4)
+    hal::peripheral hal::afio(&RCC->APB2ENR, RCC_APB2ENR_SYSCFGEN);
 #endif

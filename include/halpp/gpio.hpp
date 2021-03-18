@@ -18,6 +18,8 @@ namespace hal
 
     using pin_mode = detail::pin_mode;
 
+    
+
     class pin_base
     {
     public:
@@ -30,7 +32,15 @@ namespace hal
 
         virtual gpio_base* parent() = 0;
         virtual bool can_register_exti() = 0;
-        virtual bool interrupt(uint8_t, hal::function<void()>&&, bool = false) = 0;
+
+        template<typename T, typename std::enable_if_t<!is_function<T>::value, int> = 0>
+        bool interrupt(uint8_t tr, T& func, bool force = false)
+        {
+            return interrupt(tr, hal::function(func), force);
+        }
+
+
+        virtual bool interrupt(uint8_t, const hal::function<void()>&, bool = false) = 0;
 
         void write(bool value);
     };
@@ -63,7 +73,7 @@ namespace hal
 
         bool can_register_exti();
         
-        bool interrupt(uint8_t trig, hal::function<void()>&& handler, bool force = false);
+        bool interrupt(uint8_t trig, const hal::function<void()>& handler, bool force = false);
 
         uint8_t get_exti_line();
 

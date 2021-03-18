@@ -32,7 +32,7 @@ void hal::interrupt::trigger_exti(uint8_t line)
         exti_handlers[line]();
 }
 
-volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::function<void()>&& handler, char port_name, bool force, uint8_t prio)
+volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, const hal::function<void()>& handler, char port_name, bool force, uint8_t prio)
 {
     if(line >= hal::detail::EXTI_COUNT)
         return false;
@@ -40,7 +40,7 @@ volatile bool hal::interrupt::register_exti(uint8_t line, uint8_t trig, hal::fun
     if(!force && !hal::interrupt::is_free_exti(line)) 
         return false;
 
-    exti_handlers[line] = std::move(handler);
+    exti_handlers[line] = function(handler);
 
     #if defined(STM32F1) || defined(STM32F0) || defined(STM32F4)
         if(!trig) return false;

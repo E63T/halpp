@@ -2,6 +2,7 @@ halpp
 ==
 
 Just another C++ hardware abstraction Layer :sweat_smile:
+:warning: Needs adaptation to `std::hardware` design and [Silica](https://github.com/E63T/silica) 
 
 :warning: Experimental, use at your own risk.
 
